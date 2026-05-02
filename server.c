@@ -58,8 +58,6 @@ int main() {
         close(target_fd);
     }
 
-
-	}
 	close(server);
 	close(dummyfd);
 	return 0;
