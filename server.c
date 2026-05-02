@@ -25,28 +25,38 @@ int main() {
 	struct message req;
 	signal(SIGPIPE,SIG_IGN);
 	signal(SIGINT,terminate);
-	server = open("serverFIFO",O_RDONLY);
 	dummyfd = open("serverFIFO",O_WRONLY);
 
+
 	while (1) {
-		// TODO:
-		// read requests from serverFIFO
+        // Open FIFO for reading (blocks until a writer connects)
+		server = open("serverFIFO",O_RDONLY);
+        if (server < 0) {
+            perror("open");
+            continue;
+        }
 
+        // Read message from client
+        if (read(server, &req, sizeof(req)) <= 0) {
+            close(server);
+            continue;
+        }
 
+        close(server);
 
+        printf("From %s -> %s: %s\n",
+               req.source, req.target, req.msg);
 
+        // Open target FIFO and send message
+        int target_fd = open(req.target, O_WRONLY);
+        if (target_fd < 0) {
+            perror("target open failed");
+            continue;
+        }
 
-
-		printf("Received a request from %s to send the message %s to %s.\n",req.source,req.msg,req.target);
-
-		// TODO:
-		// open target FIFO and write the whole message struct to the target FIFO
-		// close target FIFO after writing the message
-
-
-
-
-
+        write(target_fd, &req, sizeof(req));
+        close(target_fd);
+    }
 
 
 	}
