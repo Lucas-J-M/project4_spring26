@@ -30,7 +30,7 @@ void sendmsg (char *user, char *target, char *msg) {
 	// TODO:
 	// Send a request to the server to send the message (msg) to the target user (target)
 	// by creating the message structure and writing it to server's FIFO
-	contst char *path = "serverFIFO";
+	const char *path = "serverFIFO";
 	int fd = open(path, O_WRONLY);
 	struct message req;
 	strcpy(req.source,user);
@@ -60,7 +60,7 @@ void* messageListener(void *arg) {
 	struct message req;
 	int fd = open(uName, O_RDONLY);
 	for (;;){
-		read(uName, &req, sizeof(req));
+		read(fd, &req, sizeof(req));
 		printf("Incoming message from %s: %s\n", req.source, req.msg);
 	}
 
