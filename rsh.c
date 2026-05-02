@@ -60,18 +60,30 @@ void* messageListener(void *arg) {
 	// following format
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
-	char buff[200];
-	struct message req;
-	int fd = open(uName, O_RDONLY);
-	for (;;){
-		ssize_t n = read(fd, &req, sizeof(req));
-		if (n <= 0) continue;
-		printf("Incoming message from %s: %s\n", req.source, req.msg);
-	}
+    struct message req;
 
+    int fd = open(uName, O_RDONLY);
+    if (fd < 0) {
+        perror("open fifo");
+        pthread_exit(NULL);
+    }
 
+    while (1) {
+        ssize_t n = read(fd, &req, sizeof(req));
 
+        if (n > 0) {
+            printf("Incoming message from %s: %s\n",
+                   req.source, req.msg);
+            fflush(stdout);
+        }
+        else if (n == 0) {
+            // All writers closed → reopen FIFO
+            close(fd);
+            fd = open(uName, O_RDONLY);
+        }
+    }
 
+    close(fd);
 	pthread_exit((void*)0);
 }
 
