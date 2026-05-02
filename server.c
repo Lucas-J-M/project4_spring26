@@ -41,8 +41,8 @@ int main() {
             continue;
         }
 
-        printf("From %s -> %s: %s\n",
-               req.source, req.target, req.msg);
+        printf("Received a request from %s to send the message %s to %s\n",
+               req.source, req.msg, req.target);
 
         // Open target FIFO and send message
         int target_fd = open(req.target, O_WRONLY);
