@@ -38,11 +38,8 @@ int main() {
 
         // Read message from client
         if (read(server, &req, sizeof(req)) <= 0) {
-            close(server);
             continue;
         }
-
-        close(server);
 
         printf("From %s -> %s: %s\n",
                req.source, req.target, req.msg);
