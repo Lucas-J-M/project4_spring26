@@ -32,7 +32,7 @@ int main() {
          ssize_t n = read(server, &req, sizeof(req));
 
         if (n > 0) {
-        	printf("Received a request from %s to send the message %s to %s\n",
+        	printf("Received a request from %s to send the message %s to %s.\n",
                req.source, req.msg, req.target);
             int target_fd = open(req.target, O_WRONLY);
             if (target_fd < 0) continue;
