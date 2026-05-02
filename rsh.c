@@ -60,7 +60,8 @@ void* messageListener(void *arg) {
 	struct message req;
 	int fd = open(uName, O_RDONLY);
 	for (;;){
-		read(fd, &req, sizeof(req));
+		ssize_t n = read(fd, &req, sizeof(req));
+		if (n <= 0) continue;
 		printf("Incoming message from %s: %s\n", req.source, req.msg);
 	}
 
@@ -100,6 +101,7 @@ int main(int argc, char **argv) {
     // create the message listener thread
 	pthread_t listenerThread;
 	pthread_create(&listenerThread, NULL, messageListener, NULL);
+	ptheard_detach(listenerThread);
 
     while (1) {
 
@@ -124,6 +126,10 @@ int main(int argc, char **argv) {
 	if (strcmp(cmd,"sendmsg")==0) {
 		// TODO: Create the target user and
 		// the message string and call the sendmsg function
+		if (fd < 0) {
+    		perror("open serverFIFO");
+    		continue;
+		}	
 		char *user = uName;
 		char *target = strtok(NULL, " ");
 		if (target == NULL) {
